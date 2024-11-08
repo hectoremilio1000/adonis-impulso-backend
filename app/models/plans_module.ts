@@ -1,21 +1,15 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 
-export default class Sede extends BaseModel {
+export default class PlansModule extends BaseModel {
   @column({ isPrimary: true })
   declare id: number
 
   @column()
-  declare name: string
+  declare planId: number // clave foránea a `plans`
 
   @column()
-  declare location: string
-
-  @column()
-  declare map_url: string
-
-  @column()
-  declare company_id: number
+  declare moduleId: number // clave foránea a `modules`
 
   @column()
   declare created_by: number

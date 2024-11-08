@@ -11,6 +11,26 @@ export default class AuthController {
       expiresIn: '30 days',
     })
   }
+  async createUser({ request }: HttpContext) {
+    try {
+      const data = await request.validateUsing(registerValidator)
+      const user = await User.create(data)
+      return {
+        status: 'success',
+        code: 201,
+        message: 'Usuario Creado correctamente',
+        data: user,
+      }
+    } catch (error) {
+      console.log(error)
+      return {
+        status: 'error',
+        code: 500,
+        message: 'Error creating plan',
+        error: error.message,
+      }
+    }
+  }
 
   async login({ request }: HttpContext) {
     const { email, password } = await request.validateUsing(loginValidator)

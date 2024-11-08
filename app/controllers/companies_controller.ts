@@ -8,8 +8,15 @@ export default class CompaniesController {
       const user = auth.user!
       if (user.rol_id === 1) {
         // Superadmin
-        const businesses = await Company.query().preload('admin').preload('sedes')
-        console.log(businesses)
+        const businesses = await Company.query()
+          .preload('admin', (adminQuery) => {
+            adminQuery.preload('subscriptions', (subscriptionQuery) => {
+              subscriptionQuery
+                .preload('plan') // Cargar el plan asociado a la suscripción
+                .orderBy('end_date', 'desc') // Ordenar por fecha de fin en orden descendente
+            })
+          })
+          .preload('sedes')
         return {
           status: 'success',
           code: 200,
@@ -30,23 +37,33 @@ export default class CompaniesController {
       return {
         status: 'error',
         code: 500,
-        message: 'Error fetching modules',
+        message: 'Error fetching companias',
         error: error.message,
       }
     }
   }
 
   async store({ request, auth }: HttpContext) {
-    const user = auth.user!
-    if (user.rol_id === 1) {
+    try {
+      await auth.check()
+      const userId = auth.user?.id
       const data = request.only(['name', 'email', 'logo', 'website', 'phone_contact', 'user_id'])
-      const business = await Company.create({ ...data, created_by: user.id })
-      return business
-    } else {
-      const admin = auth.user!
-      const data = request.only(['name', 'email', 'logo', 'website', 'phone_contact'])
-      const business = await Company.create({ ...data, user_id: admin.id, created_by: admin.id })
-      return business
+      const business = await Company.create({ ...data, created_by: userId })
+
+      return {
+        status: 'success',
+        code: 201,
+        message: 'Plan creado correctamente con módulos asociados',
+        data: business,
+      }
+    } catch (error) {
+      console.log(error)
+      return {
+        status: 'error',
+        code: 500,
+        message: 'Error creating plan',
+        error: error.message,
+      }
     }
   }
 
