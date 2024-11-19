@@ -10,12 +10,15 @@
 import router from '@adonisjs/core/services/router'
 const AuthController = () => import('#controllers/auth_controller')
 import { middleware } from './kernel.js'
-import PlansController from '#controllers/plans_controller'
-import RolesController from '#controllers/roles_controller'
-import ModulesController from '#controllers/modules_controller'
-import CompaniesController from '#controllers/companies_controller'
-import SedesController from '#controllers/sedes_controller'
-import SubscriptionsController from '#controllers/subscriptions_controller'
+const ProspectsController = () => import('#controllers/prospects_controller')
+const SectionsController = () => import('#controllers/sections_controller')
+const PlansController = () => import('#controllers/plans_controller')
+const RolesController = () => import('#controllers/roles_controller')
+const ModulesController = () => import('#controllers/modules_controller')
+const CompaniesController = () => import('#controllers/companies_controller')
+const SedesController = () => import('#controllers/sedes_controller')
+const SubscriptionsController = () => import('#controllers/subscriptions_controller')
+const SuccesscasesController = () => import('#controllers/successcases_controller')
 // import AuthController from '#controllers/auth_controller'
 
 router.get('/api', async () => {
@@ -72,3 +75,20 @@ router.get('/api/modules/:id', [ModulesController, 'show']).as('module.show')
 router.post('/api/modules', [ModulesController, 'store']).as('module.store')
 router.put('/api/modules/:id', [ModulesController, 'update']).as('module.update')
 router.delete('/api/modules/:id', [ModulesController, 'destroy']).as('module.destroy')
+
+// RUTAS PARA CASOS DE ESTUDIO
+router.get('/api/successcases', [SuccesscasesController, 'index']).as('successcases.index')
+router.get('/api/successcases/:id', [SuccesscasesController, 'show']).as('successcases.show')
+router.post('/api/successcases', [SuccesscasesController, 'store']).as('successcases.store')
+// router.put('/api/successcases/:id', [SuccesscasesController, 'update']).as('successcases.update')
+// router.delete('/api/successcases/:id', [SuccesscasesController, 'destroy']).as('plan.destroy')
+
+// RUTAS PARA SECTIONS
+
+router.post('/api/sections', [SectionsController, 'store']).as('sections.store')
+// router.put('/api/successcases/:id', [SuccesscasesController, 'update']).as('successcases.update')
+// router.delete('/api/successcases/:id', [SuccesscasesController, 'destroy']).as('plan.destroy')
+
+//RUTA PARA RECIBIR LOS DATOS DE LOS PROSPECTS
+router.post('/api/prospects', [ProspectsController, 'store']).as('prospect.store')
+router.get('/api/prospects', [ProspectsController, 'index']).as('prospect.index')
