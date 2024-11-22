@@ -78,11 +78,25 @@ export default class ModulesController {
 
   // Actualizar un module existente (PUT /modules/:id)
   public async update({ params, request }: HttpContext) {
-    const module = await Module.findOrFail(params.id)
-    const data = request.only(['name', 'price', 'description', 'active'])
-    module.merge(data)
-    await module.save()
-    return module
+    try {
+      const module = await Module.findOrFail(params.id)
+      const data = request.only(['name', 'description'])
+      module.merge(data)
+      await module.save()
+      return {
+        status: 'success',
+        code: 201,
+        message: 'Module update successfully',
+        data: module,
+      }
+    } catch (error) {
+      return {
+        status: 'error',
+        code: 500,
+        message: 'Error update module',
+        error: error.message,
+      }
+    }
   }
 
   // Eliminar un module (DELETE /modules/:id)

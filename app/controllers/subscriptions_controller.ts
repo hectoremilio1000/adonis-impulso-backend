@@ -30,6 +30,31 @@ export default class SubscriptionsController {
     const subscription = await Subscription.query().where('id', params.id).firstOrFail() // Cargar módulos relacionados
     return subscription
   }
+  // Mostrar un plan individual por ID (GET /plans/:id)
+  public async subscriptionbyuser({ params }: HttpContext) {
+    try {
+      const plan = await Subscription.query()
+        .where('user_id', params.id)
+        .preload('plan', (planQuery) => {
+          planQuery.preload('modules') // Cargar el plan asociado a la suscripción
+        })
+        .firstOrFail()
+      return {
+        status: 'success',
+        code: 200,
+        message: 'Modules fetched successfully',
+        data: plan,
+      }
+    } catch (error) {
+      console.log(error)
+      return {
+        status: 'error',
+        code: 500,
+        message: 'Error fetching subscriptions',
+        error: error.message,
+      }
+    }
+  }
 
   // Crear un nuevo subscription (POST /subscriptions)
   public async store({ request, auth }: HttpContext) {

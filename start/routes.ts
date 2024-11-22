@@ -53,6 +53,9 @@ router.delete('/api/roles/:id', [RolesController, 'destroy']).as('role.destroy')
 // RUTAS PARA SUBSCRIPTIONS
 router.get('/api/subscriptions', [SubscriptionsController, 'index']).as('subscription.index')
 router.get('/api/subscriptions/:id', [SubscriptionsController, 'show']).as('subscription.show')
+router
+  .get('/api/subscriptionbyuser/:id', [SubscriptionsController, 'subscriptionbyuser'])
+  .as('subscription.subscriptionbyuser')
 router.post('/api/subscriptions', [SubscriptionsController, 'store']).as('subscription.store')
 router.put('/api/subscriptions/:id', [SubscriptionsController, 'update']).as('subscription.update')
 router
@@ -71,4 +74,4 @@ router.get('/api/modules', [ModulesController, 'index']).as('module.index')
 router.get('/api/modules/:id', [ModulesController, 'show']).as('module.show')
 router.post('/api/modules', [ModulesController, 'store']).as('module.store')
 router.put('/api/modules/:id', [ModulesController, 'update']).as('module.update')
-router.delete('/api/modules/:id', [ModulesController, 'destroy']).as('module.destroy')
+router.delete('/api/ /:id', [ModulesController, 'destroy']).as('module.destroy')

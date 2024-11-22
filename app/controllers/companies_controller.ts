@@ -25,7 +25,7 @@ export default class CompaniesController {
         }
       } else if (user.rol_id === 2) {
         // Admin
-        const businesses = await Company.query().where('user_id', user.id)
+        const businesses = await Company.query().where('user_id', user.id).preload('sedes')
         return {
           status: 'success',
           code: 200,
