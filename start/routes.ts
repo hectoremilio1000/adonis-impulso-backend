@@ -8,8 +8,11 @@
 */
 
 import router from '@adonisjs/core/services/router'
+
 const AuthController = () => import('#controllers/auth_controller')
 import { middleware } from './kernel.js'
+const TestMailController = () => import('#controllers/test_mails_controller')
+
 const ProspectsController = () => import('#controllers/prospects_controller')
 const SectionsController = () => import('#controllers/sections_controller')
 const PlansController = () => import('#controllers/plans_controller')
@@ -92,3 +95,6 @@ router.post('/api/sections', [SectionsController, 'store']).as('sections.store')
 //RUTA PARA RECIBIR LOS DATOS DE LOS PROSPECTS
 router.post('/api/prospects', [ProspectsController, 'store']).as('prospect.store')
 router.get('/api/prospects', [ProspectsController, 'index']).as('prospect.index')
+
+//RUTA CORREO
+router.get('/api/test-mail', [TestMailController, 'sendTestEmail']).as('testEmail')
