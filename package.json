@@ -61,6 +61,7 @@
     "luxon": "^3.5.0",
     "mysql2": "^3.11.3",
     "nodemailer": "^6.9.16",
+    "openai": "^4.73.0",
     "reflect-metadata": "^0.2.2"
   },
   "hotHook": {
