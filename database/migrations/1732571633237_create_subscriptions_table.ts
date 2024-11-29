@@ -8,6 +8,7 @@ export default class extends BaseSchema {
       table.increments('id')
       table.integer('user_id').unsigned().references('id').inTable('users')
       table.integer('plan_id').unsigned().references('id').inTable('plans')
+      table.boolean('is_payment').defaultTo(false).notNullable()
       table.dateTime('start_date').notNullable()
       table.dateTime('end_date').notNullable()
       table.enum('status', ['active', 'expired', 'cancelled']).notNullable()

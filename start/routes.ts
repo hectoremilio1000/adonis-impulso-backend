@@ -17,6 +17,7 @@ import CompaniesController from '#controllers/companies_controller'
 import SedesController from '#controllers/sedes_controller'
 import SubscriptionsController from '#controllers/subscriptions_controller'
 import TestMailsController from '#controllers/test_mails_controller'
+import PaymentsController from '#controllers/payments_controller'
 // import AuthController from '#controllers/auth_controller'
 
 router.get('/api', async () => {
@@ -52,6 +53,13 @@ router.put('/api/roles/:id', [RolesController, 'update']).as('role.update')
 router.delete('/api/roles/:id', [RolesController, 'destroy']).as('role.destroy')
 
 router.post('/api/testemail', [TestMailsController, 'index']).as('testmail.index')
+router.post('/api/testpayment', [PaymentsController, 'store']).as('payment.store')
+router
+  .post('/api/testpayment/notifications', [PaymentsController, 'notification'])
+  .as('payment.notification')
+router
+  .get('/api/testpayment/:type/:id', [PaymentsController, 'showSubscription'])
+  .as('payment.showSubscription')
 // RUTAS PARA SUBSCRIPTIONS
 router.get('/api/subscriptions', [SubscriptionsController, 'index']).as('subscription.index')
 router.get('/api/subscriptions/:id', [SubscriptionsController, 'show']).as('subscription.show')
