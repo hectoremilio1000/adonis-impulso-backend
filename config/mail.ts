@@ -11,13 +11,16 @@ const mailConfig = defineConfig({
    */
   mailers: {
     smtp: transports.smtp({
-      host: 'mail.impulsorestaurantero.com', // Servidor SMTP
-      port: 465, // Puerto seguro para SMTP
-      secure: true, // Requiere conexión segura
+      host: env.get('SMTP_HOST'),
+      port: env.get('SMTP_PORT'),
+      /**
+       * Uncomment the auth block if your SMTP
+       * server needs authentication
+       */
       auth: {
         type: 'login',
-        user: 'clientes@impulsorestaurantero.com', // Tu usuario SMTP
-        pass: '01Hv1930#', // Contraseña de tu cuenta SMTP
+        user: env.get('SMTP_USERNAME'),
+        pass: env.get('SMTP_PASSWORD'),
       },
     }),
   },

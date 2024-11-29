@@ -11,7 +11,8 @@ import router from '@adonisjs/core/services/router'
 
 const AuthController = () => import('#controllers/auth_controller')
 import { middleware } from './kernel.js'
-const TestMailController = () => import('#controllers/test_mails_controller')
+const OpeanaichatsController = () => import('#controllers/opeanaichats_controller')
+const TestMailsController = () => import('#controllers/test_mails_controller')
 
 const ProspectsController = () => import('#controllers/prospects_controller')
 const SectionsController = () => import('#controllers/sections_controller')
@@ -96,5 +97,9 @@ router.post('/api/sections', [SectionsController, 'store']).as('sections.store')
 router.post('/api/prospects', [ProspectsController, 'store']).as('prospect.store')
 router.get('/api/prospects', [ProspectsController, 'index']).as('prospect.index')
 
-//RUTA CORREO
-router.get('/api/test-mail', [TestMailController, 'sendTestEmail']).as('testEmail')
+//RUTA PARA RECIBIR LOS MAILS DE LOS PROSPECTOS//
+
+router.post('/api/testemail', [TestMailsController, 'index']).as('testmail.index')
+// RUTA PARA OPENAI PARA RESPONDER
+
+router.post('api/chatgtp', [OpeanaichatsController, 'ask']).as('chatgtpask.ask')

@@ -1,35 +1,30 @@
 import { HttpContext } from '@adonisjs/core/http'
 import mail from '@adonisjs/mail/services/main'
+import env from '#start/env'
 
 export default class TestMailController {
-  public async sendTestEmail({ request, response }: HttpContext) {
+  public async index({ request }: HttpContext) {
+    const data = request.only(['email', 'message']) // Asume que estos campos existen
+    console.log(data)
+
     try {
-      // Datos opcionales para personalizar el correo
-
-      // Envío del correo
       await mail.send((message) => {
-        message
-          .from('clientes@impulsorestaurantero.com') // Dirección del remitente
-          .to('hectoremilio1000@gmail.com') // Dirección del destinatario
-          .subject('Correo de Prueba') // Asunto del correo
+        message.to(data.email).from(env.get('SMTP_USERNAME')).subject(data.message)
       })
 
-      // Respuesta exitosa
-      return response.status(201).json({
+      return {
         status: 'success',
-        code: 201,
-        message: 'Correo enviado correctamente',
-      })
+        code: 200,
+        message: 'Mensaje enviado correctamente',
+      }
     } catch (error) {
-      console.error('Error al enviar correo:', error)
-
-      // Manejo de errores
-      return response.status(500).json({
+      console.log(error)
+      return {
         status: 'error',
         code: 500,
-        message: 'Error al enviar correo',
+        message: 'Error  send email',
         error: error.message,
-      })
+      }
     }
   }
 }
