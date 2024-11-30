@@ -25,6 +25,7 @@ const SubscriptionsController = () => import('#controllers/subscriptions_control
 const SuccesscasesController = () => import('#controllers/successcases_controller')
 import TestMailsController from '#controllers/test_mails_controller'
 import PaymentsController from '#controllers/payments_controller'
+import OpeanaichatsController from '#controllers/opeanaichats_controller'
 // import AuthController from '#controllers/auth_controller'
 
 router.get('/api', async () => {
@@ -59,7 +60,10 @@ router.post('/api/roles', [RolesController, 'store']).as('role.store')
 router.put('/api/roles/:id', [RolesController, 'update']).as('role.update')
 router.delete('/api/roles/:id', [RolesController, 'destroy']).as('role.destroy')
 
+// TEST DE MAIL
 router.post('/api/testemail', [TestMailsController, 'index']).as('testmail.index')
+
+// TESTS DE PAYMENTS MERCADO PAGO
 router.post('/api/testpayment', [PaymentsController, 'store']).as('payment.store')
 router
   .post('/api/testpayment/notifications', [PaymentsController, 'notification'])
@@ -67,6 +71,7 @@ router
 router
   .get('/api/testpayment/:type/:id', [PaymentsController, 'showSubscription'])
   .as('payment.showSubscription')
+
 // RUTAS PARA SUBSCRIPTIONS
 router.get('/api/subscriptions', [SubscriptionsController, 'index']).as('subscription.index')
 router.get('/api/subscriptions/:id', [SubscriptionsController, 'show']).as('subscription.show')
@@ -91,7 +96,6 @@ router.get('/api/modules', [ModulesController, 'index']).as('module.index')
 router.get('/api/modules/:id', [ModulesController, 'show']).as('module.show')
 router.post('/api/modules', [ModulesController, 'store']).as('module.store')
 router.put('/api/modules/:id', [ModulesController, 'update']).as('module.update')
-
 router.delete('/api/modules/:id', [ModulesController, 'destroy']).as('module.destroy')
 
 // RUTAS PARA CASOS DE ESTUDIO
@@ -110,3 +114,6 @@ router.post('/api/sections', [SectionsController, 'store']).as('sections.store')
 //RUTA PARA RECIBIR LOS DATOS DE LOS PROSPECTS
 router.post('/api/prospects', [ProspectsController, 'store']).as('prospect.store')
 router.get('/api/prospects', [ProspectsController, 'index']).as('prospect.index')
+
+// RUTA PARA OPENAI
+router.post('api/chatgtp', [OpeanaichatsController, 'ask']).as('chatgtpask.ask')
