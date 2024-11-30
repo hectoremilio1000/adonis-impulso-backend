@@ -2,7 +2,7 @@ import Successcase from '#models/successcase'
 import type { HttpContext } from '@adonisjs/core/http'
 
 export default class SuccesscasesController {
-  async index({ request }: HttpContext) {
+  async index({}: HttpContext) {
     // await auth.check()
     try {
       // const user = auth.user!
