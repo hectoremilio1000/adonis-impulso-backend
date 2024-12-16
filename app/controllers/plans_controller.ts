@@ -77,13 +77,83 @@ export default class PlansController {
   }
 
   // Actualizar un plan existente (PUT /plans/:id)
-  public async update({ params, request }: HttpContext) {
-    console.log(params)
-    const plan = await Plan.findOrFail(params.id)
-    const data = request.only(['name', 'price', 'description', 'created_by', 'active'])
-    plan.merge(data)
-    await plan.save()
-    return plan
+  public async update({ params, request, auth }: HttpContext) {
+    try {
+      // Verificar autenticación
+      await auth.check()
+      const userId = auth.user?.id
+      if (!userId) {
+        return {
+          status: 'error',
+          code: 401,
+          message: 'Usuario no autorizado',
+        }
+      }
+
+      // Buscar el plan y obtener los datos del request
+      const plan = await Plan.findOrFail(params.id)
+      const data = request.only([
+        'name',
+        'price',
+        'description',
+        'active',
+        'addModules',
+        'removeModules',
+      ])
+
+      // Actualizar los datos del plan
+      plan.merge({
+        name: data.name,
+        price: data.price,
+        description: data.description,
+        active: data.active,
+      })
+      await plan.save()
+
+      // Manejar módulos a agregar
+      if (data.addModules && data.addModules.length > 0) {
+        const modulesToAdd = data.addModules.map((module: any) => ({
+          plan_id: plan.id,
+          module_id: module.id,
+          created_by: userId,
+        }))
+        await PlansModule.createMany(modulesToAdd) // Crear asociaciones en la tabla intermedia
+      }
+
+      // Manejar módulos a eliminar
+      if (data.removeModules && data.removeModules.length > 0) {
+        const moduleIdsToRemove = data.removeModules.map((module: any) => module.id)
+        await PlansModule.query()
+          .where('plan_id', plan.id)
+          .whereIn('module_id', moduleIdsToRemove)
+          .delete() // Eliminar asociaciones en la tabla intermedia
+      }
+
+      // Devolver respuesta exitosa
+      return {
+        status: 'success',
+        code: 200,
+        message: 'Plan actualizado correctamente con módulos asociados',
+        data: {
+          id: plan.id,
+          name: plan.name,
+          price: plan.price,
+          description: plan.description,
+          active: plan.active,
+          updatedAt: plan.updatedAt,
+          addModules: data.addModules,
+          removeModules: data.removeModules,
+        },
+      }
+    } catch (error) {
+      console.error(error)
+      return {
+        status: 'error',
+        code: 500,
+        message: 'Error al actualizar el plan',
+        error: error.message,
+      }
+    }
   }
 
   // Eliminar un plan (DELETE /plans/:id)
