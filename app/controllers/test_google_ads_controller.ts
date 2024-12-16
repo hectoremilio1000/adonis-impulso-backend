@@ -86,6 +86,7 @@ export default class TestGoogleAdsController {
   }
   async getAccounts({ session, response }: HttpContext) {
     const tokens = session.get('google_ads_token')
+    console.log('Tokens session guardada')
     console.log(tokens)
     if (!tokens) {
       return response.unauthorized({ message: 'Token no encontrado. Inicia sesión primero.' })
