@@ -55,6 +55,7 @@ export default class TestGoogleAdsController {
 
       // Verifica que el estado coincida con el almacenado en la sesión
       const storedState = session.get('state')
+      console.log('state')
       if (!storedState || storedState !== state) {
         return response.status(400).send('Estado no válido o sesión expirada.')
       }
