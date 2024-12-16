@@ -40,4 +40,18 @@ export default await Env.create(new URL('../', import.meta.url), {
   SMTP_PASSWORD: Env.schema.string(),
   MP_ACCESS_TOKEN: Env.schema.string(),
   APP_URL: Env.schema.string(),
+  // CREDENTIALS GOOGLE ADS API
+  CLIENT_ID: Env.schema.string(),
+  CLIENT_SECRET: Env.schema.string(),
+  DEVELOPER_TOKEN: Env.schema.string(),
+  MANAGER_CUSTOMER_ID: Env.schema.string(),
+  CUSTOMER_ID: Env.schema.string(),
+  REDIRECT_URL: Env.schema.string(),
+
+  /*
+  |----------------------------------------------------------
+  | Variables for configuring session package
+  |----------------------------------------------------------
+  */
+  SESSION_DRIVER: Env.schema.enum(['cookie', 'memory'] as const),
 })

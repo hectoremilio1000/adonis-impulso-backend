@@ -26,6 +26,7 @@ const SuccesscasesController = () => import('#controllers/successcases_controlle
 import TestMailsController from '#controllers/test_mails_controller'
 import PaymentsController from '#controllers/payments_controller'
 import OpeanaichatsController from '#controllers/opeanaichats_controller'
+import TestGoogleAdsController from '#controllers/test_google_ads_controller'
 // import AuthController from '#controllers/auth_controller'
 
 router.get('/api', async () => {
@@ -62,6 +63,9 @@ router.delete('/api/roles/:id', [RolesController, 'destroy']).as('role.destroy')
 
 // TEST DE MAIL
 router.post('/api/testemail', [TestMailsController, 'index']).as('testmail.index')
+router
+  .post('/api/forwordpassword', [TestMailsController, 'forwordPassword'])
+  .as('testmail.forwordPassword')
 
 // TESTS DE PAYMENTS MERCADO PAGO
 router.post('/api/testpayment', [PaymentsController, 'store']).as('payment.store')
@@ -71,6 +75,16 @@ router
 router
   .get('/api/testpayment/:type/:id', [PaymentsController, 'showSubscription'])
   .as('payment.showSubscription')
+
+// TEST DE API GOOGLE ADS
+router.get('/api/googleautorize', [TestGoogleAdsController, 'index']).as('payment.index')
+router
+  .get('/api/oauth2callback', [TestGoogleAdsController, 'oauth2callback'])
+  .as('payment.oauth2callback')
+router.get('/api/getAccounts', [TestGoogleAdsController, 'getAccounts']).as('payment.getAccounts')
+router
+  .get('/api/getCampaigns/:accountId', [TestGoogleAdsController, 'getCampaigns'])
+  .as('payment.getCampaigns')
 
 // RUTAS PARA SUBSCRIPTIONS
 router.get('/api/subscriptions', [SubscriptionsController, 'index']).as('subscription.index')
