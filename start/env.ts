@@ -47,6 +47,7 @@ export default await Env.create(new URL('../', import.meta.url), {
   MANAGER_CUSTOMER_ID: Env.schema.string(),
   CUSTOMER_ID: Env.schema.string(),
   REDIRECT_URL: Env.schema.string(),
+  REDIRECT_URL_FRONT: Env.schema.string(),
 
   /*
   |----------------------------------------------------------

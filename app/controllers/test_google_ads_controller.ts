@@ -73,7 +73,7 @@ export default class TestGoogleAdsController {
 
       oauth2Client.setCredentials(tokens)
       // Redirige a una página de éxito (puedes cambiar la URL según tu app)
-      response.redirect('http://localhost:3000/adsgoogle')
+      response.redirect(env.get('REDIRECT_URL_FRONT'))
     } catch (error) {
       console.error('Error durante el intercambio de tokens:', error.message)
       return response.status(500).send({
