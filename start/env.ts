@@ -48,6 +48,13 @@ export default await Env.create(new URL('../', import.meta.url), {
   CUSTOMER_ID: Env.schema.string(),
   REDIRECT_URL: Env.schema.string(),
   REDIRECT_URL_FRONT: Env.schema.string(),
+  // CREDENTIALS CALENDLY API
+  CALENDLY_CLIENT_ID: Env.schema.string(),
+  CALENDLY_CLIENT_SECRET: Env.schema.string(),
+  CALENDLY_AUTH_BASE_URL: Env.schema.string(),
+  CALENDLY_API_BASE_URL: Env.schema.string(),
+  CALENDLY_REDIRECT_URI: Env.schema.string(),
+  CALENDLY_BASE_URL: Env.schema.string(),
 
   /*
   |----------------------------------------------------------

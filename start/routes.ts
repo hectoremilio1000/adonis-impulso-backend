@@ -27,6 +27,8 @@ import TestMailsController from '#controllers/test_mails_controller'
 import PaymentsController from '#controllers/payments_controller'
 import OpeanaichatsController from '#controllers/opeanaichats_controller'
 import TestGoogleAdsController from '#controllers/test_google_ads_controller'
+import AuthCalendliesController from '#controllers/auth_calendlies_controller'
+import CalendlyEventsController from '#controllers/calendly_events_controller'
 // import AuthController from '#controllers/auth_controller'
 
 router.get('/api', async () => {
@@ -85,6 +87,18 @@ router.get('/api/getAccounts', [TestGoogleAdsController, 'getAccounts']).as('pay
 router
   .get('/api/getCampaigns/:accountId', [TestGoogleAdsController, 'getCampaigns'])
   .as('payment.getCampaigns')
+
+// TEST DE API CALENDLY
+router
+  .get('/api/oauth/calendly', [AuthCalendliesController, 'redirectToCalendly'])
+  .as('auth.redirectToCalendly')
+router.get('/api/calendly/status', [AuthCalendliesController, 'status']).as('auth.status')
+router
+  .get('/api/oauth/calendly/callback', [AuthCalendliesController, 'handleCallback'])
+  .as('auth.handleCallback')
+router
+  .get('/api/calendly/event_types', [CalendlyEventsController, 'index'])
+  .as('calend_event.index')
 
 // RUTAS PARA SUBSCRIPTIONS
 router.get('/api/subscriptions', [SubscriptionsController, 'index']).as('subscription.index')
