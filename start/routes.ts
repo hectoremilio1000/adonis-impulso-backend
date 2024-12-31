@@ -99,6 +99,18 @@ router
 router
   .get('/api/calendly/event_types', [CalendlyEventsController, 'index'])
   .as('calend_event.index')
+router
+  .get('/api/calendly/event_types/:uuid', [CalendlyEventsController, 'eventTypeByUuid'])
+  .as('calend_event.eventTypeByUuid')
+router
+  .get('/api/calendly/event_type_available_times', [
+    CalendlyEventsController,
+    'eventTypeAvailableTimes',
+  ])
+  .as('calend_event.eventTypeAvailableTimes')
+router
+  .get('/api/calendly/scheduled_events', [CalendlyEventsController, 'scheduledEvents'])
+  .as('calend_event.scheduledEvents')
 
 // RUTAS PARA SUBSCRIPTIONS
 router.get('/api/subscriptions', [SubscriptionsController, 'index']).as('subscription.index')
