@@ -35,18 +35,18 @@ export default class AuthCalendliesController {
   async redirectToCalendly({ request, response }: HttpContext) {
     const redirectUri = env.get('CALENDLY_REDIRECT_URI')
     const clientId = env.get('CALENDLY_CLIENT_ID')
-    const state = request.qs().redirect // Captura el parámetro de redirección
+    const userId = request.qs().userId
+    const redirect = request.qs().redirect
     const authorizationUrl = `${env.get('CALENDLY_AUTH_BASE_URL')}/oauth/authorize`
+    console.log(redirect, userId)
 
-    const url = `${authorizationUrl}?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&state=${encodeURIComponent(
-      state
-    )}`
+    const url = `${authorizationUrl}?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&redirect=${redirect}&userId=${userId}`
     return response.redirect(url)
   }
 
   async handleCallback({ request, response }: HttpContext) {
-    const { code, state } = request.qs() // Recupera el parámetro `state`
-
+    const { code, redirect, userId } = request.qs() // Recupera el parámetro `state`
+    console.log(redirect, userId)
     try {
       const tokenUrl = `${env.get('CALENDLY_AUTH_BASE_URL')}/oauth/token`
 
@@ -81,12 +81,12 @@ export default class AuthCalendliesController {
           calendly_uid: userInfo.data.resource.uri,
           access_token,
           refresh_token,
-          user_id: 14,
+          user_id: userId,
         })
       }
 
       // Redirige al estado original (la URL dinámica)
-      return response.redirect(state || 'http://localhost:3000/manage')
+      return response.redirect(redirect || 'http://localhost:3000/manage')
     } catch (error) {
       console.error('Error al obtener el token:', error.message)
       return response.status(500).send('Error en la autenticación')
