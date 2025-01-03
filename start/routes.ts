@@ -29,6 +29,7 @@ import OpeanaichatsController from '#controllers/opeanaichats_controller'
 import TestGoogleAdsController from '#controllers/test_google_ads_controller'
 import AuthCalendliesController from '#controllers/auth_calendlies_controller'
 import CalendlyEventsController from '#controllers/calendly_events_controller'
+import TestTiktokAdsController from '#controllers/test_tiktok_ads_controller'
 // import AuthController from '#controllers/auth_controller'
 
 router.get('/api', async () => {
@@ -87,6 +88,11 @@ router.get('/api/getAccounts', [TestGoogleAdsController, 'getAccounts']).as('pay
 router
   .get('/api/getCampaigns/:accountId', [TestGoogleAdsController, 'getCampaigns'])
   .as('payment.getCampaigns')
+
+// TEST DE API TIKTOK ADS
+router
+  .get('/api/getTempTiktokAds/:companyId', [TestTiktokAdsController, 'getCampaignsByCompanyId'])
+  .as('tiktokads.getCampaignsByCompanyId')
 
 // TEST DE API CALENDLY
 router
