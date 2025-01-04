@@ -2,6 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import axios from 'axios'
 import env from '#start/env'
 import UserCalendly from '#models/user_calendly'
+import { randomBytes } from 'crypto'
 
 export default class AuthCalendliesController {
   async status({ auth, response }: HttpContext) {
@@ -32,22 +33,39 @@ export default class AuthCalendliesController {
       })
     }
   }
-  async redirectToCalendly({ request, response }: HttpContext) {
+  async redirectToCalendly({ session, request, response }: HttpContext) {
     const redirectUri = env.get('CALENDLY_REDIRECT_URI')
     const clientId = env.get('CALENDLY_CLIENT_ID')
     const userId = request.qs().userId
     const redirect = request.qs().redirect
+    session.put('userId', userId)
+    session.put('redirect', redirect)
+    const passthroughVal = randomBytes(32).toString('hex')
+
+    // Guarda el valor en la sesión para validación posterior
+    session.put('state', passthroughVal)
+
+    // URL DE AUTHORIZACION
     const authorizationUrl = `${env.get('CALENDLY_AUTH_BASE_URL')}/oauth/authorize`
     console.log(redirect, userId)
 
-    const url = `${authorizationUrl}?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&redirect=${redirect}&userId=${userId}`
+    const url = `${authorizationUrl}?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&state=${passthroughVal}&user_id=${userId}`
     return response.redirect(url)
   }
 
-  async handleCallback({ request, response }: HttpContext) {
-    const { code, redirect, userId } = request.qs() // Recupera el parámetro `state`
-    console.log(redirect, userId)
+  async handleCallback({ session, request, response }: HttpContext) {
     try {
+      const { code, state, user_id } = request.qs() // Recupera el parámetro `state`
+
+      console.log(user_id)
+      // Verifica que el estado coincida con el almacenado en la sesión
+      const storedState = session.get('state')
+      console.log('state stored')
+      console.log(storedState)
+
+      if (!storedState || storedState !== state) {
+        return response.status(400).send('Estado no válido o sesión expirada.')
+      }
       const tokenUrl = `${env.get('CALENDLY_AUTH_BASE_URL')}/oauth/token`
 
       const { data } = await axios.post(
@@ -81,12 +99,12 @@ export default class AuthCalendliesController {
           calendly_uid: userInfo.data.resource.uri,
           access_token,
           refresh_token,
-          user_id: userId,
+          user_id: session.get('userId'),
         })
       }
 
       // Redirige al estado original (la URL dinámica)
-      return response.redirect(redirect || 'http://localhost:3000/manage')
+      return response.redirect(session.get('redirect') || 'http://localhost:3000/manage')
     } catch (error) {
       console.error('Error al obtener el token:', error.message)
       return response.status(500).send('Error en la autenticación')

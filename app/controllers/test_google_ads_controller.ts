@@ -32,6 +32,7 @@ export default class TestGoogleAdsController {
         state: passthroughVal,
         prompt: 'consent', // Asegura que siempre se solicite un refresh_token
       })
+      console.log(authUrl)
 
       // Redirige al usuario a la URL de autorización
       response.redirect(authUrl)
@@ -55,7 +56,7 @@ export default class TestGoogleAdsController {
 
       // Verifica que el estado coincida con el almacenado en la sesión
       const storedState = session.get('state')
-      console.log('state')
+      console.log(storedState)
       if (!storedState || storedState !== state) {
         return response.status(400).send('Estado no válido o sesión expirada.')
       }
