@@ -7,10 +7,14 @@ export default class CalendlyEventsController {
   async index({ request, response, auth }: HttpContext) {
     try {
       await auth.check()
+      const { companyId } = request.qs()
       const user = auth.user!
 
       // Obtener datos del usuario relacionados con Calendly
-      const userData = await UsersCalendly.findBy('user_id', user.id)
+      const userData = await UsersCalendly.query()
+        .where('user_id', user.id)
+        .andWhere('company_id', companyId)
+        .first()
 
       if (!userData) {
         return response.status(404).json({

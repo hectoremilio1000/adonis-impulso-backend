@@ -30,6 +30,9 @@ import TestGoogleAdsController from '#controllers/test_google_ads_controller'
 import AuthCalendliesController from '#controllers/auth_calendlies_controller'
 import CalendlyEventsController from '#controllers/calendly_events_controller'
 import TestTiktokAdsController from '#controllers/test_tiktok_ads_controller'
+import QuestionsController from '#controllers/questions_controller'
+import ResponsesController from '#controllers/responses_controller'
+import RecommendationsController from '#controllers/recommendations_controller'
 // import AuthController from '#controllers/auth_controller'
 
 router.get('/api', async () => {
@@ -158,8 +161,32 @@ router.post('/api/sections', [SectionsController, 'store']).as('sections.store')
 // router.delete('/api/successcases/:id', [SuccesscasesController, 'destroy']).as('plan.destroy')
 
 //RUTA PARA RECIBIR LOS DATOS DE LOS PROSPECTS
-router.post('/api/prospects', [ProspectsController, 'store']).as('prospect.store')
 router.get('/api/prospects', [ProspectsController, 'index']).as('prospect.index')
+router.get('/api/prospects/:id', [ProspectsController, 'show']).as('prospect.show')
+router.post('/api/prospects', [ProspectsController, 'store']).as('prospect.store')
+router
+  .get('/api/prospectswebsite', [ProspectsController, 'storeWebSite'])
+  .as('prospect.storeWebSite')
+
+//RUTA PARA RECIBIR LOS DATOS DE LAS QUESTIONS
+router.get('/api/questions', [QuestionsController, 'index']).as('question.index')
+router
+  .get('/api/questionsByContext/:context', [QuestionsController, 'questionsByContext'])
+  .as('question.questionsByContext')
+
+//RUTA PARA RECIBIR LOS DATOS DE LAS RESPONSES
+router.get('/api/responses', [ResponsesController, 'index']).as('response.index')
+router
+  .post('/api/responsesByGroup', [ResponsesController, 'responsesByGroup'])
+  .as('response.responsesByGroup')
+
+//RUTA PARA RECIBIR LOS DATOS DE LAS RECOMMENDATIONS
+router.get('/api/recommendations', [RecommendationsController, 'index']).as('recommendation.index')
+router
+  .get('/api/recommendations/:id', [RecommendationsController, 'show'])
+  .as('recommendation.show')
+router.post('/api/recommendations', [RecommendationsController, 'store']).as('recommendation.store')
 
 // RUTA PARA OPENAI
+
 router.post('api/chatgtp', [OpeanaichatsController, 'ask']).as('chatgtpask.ask')

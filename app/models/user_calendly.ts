@@ -17,6 +17,9 @@ export default class UsersCalendly extends BaseModel {
   @column()
   declare user_id: number
 
+  @column()
+  declare company_id: number
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

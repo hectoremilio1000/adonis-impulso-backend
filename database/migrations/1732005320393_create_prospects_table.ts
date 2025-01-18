@@ -10,6 +10,7 @@ export default class extends BaseSchema {
       table.string('last_name').notNullable()
       table.string('email').notNullable()
       table.string('whatsapp', 15).notNullable()
+      table.string('status', 255).notNullable()
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now()) // Created timestamp
       table.timestamp('updated_at', { useTz: true }).defaultTo(this.now()) // Updated timestamp
     })

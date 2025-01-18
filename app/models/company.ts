@@ -36,7 +36,7 @@ export default class Company extends BaseModel {
   declare admin: BelongsTo<typeof User>
 
   @hasMany(() => Sede, {
-    foreignKey: 'id',
+    foreignKey: 'company_id',
   })
   declare sedes: HasMany<typeof Sede>
 

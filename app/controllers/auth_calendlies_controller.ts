@@ -5,14 +5,17 @@ import UserCalendly from '#models/user_calendly'
 import { randomBytes } from 'crypto'
 
 export default class AuthCalendliesController {
-  async status({ auth, response }: HttpContext) {
+  async status({ auth, response, request }: HttpContext) {
     await auth.check()
     try {
       const user = auth.user!
-      console.log(user.id)
+      const { companyId } = request.qs()
 
       // Verificar si el usuario tiene un token de Calendly
-      const calendlyUser = await UserCalendly.query().where('user_id', user.id).first()
+      const calendlyUser = await UserCalendly.query()
+        .where('user_id', user.id)
+        .andWhere('company_id', companyId)
+        .first()
 
       if (calendlyUser) {
         return response.json({
@@ -37,8 +40,10 @@ export default class AuthCalendliesController {
     const redirectUri = env.get('CALENDLY_REDIRECT_URI')
     const clientId = env.get('CALENDLY_CLIENT_ID')
     const userId = request.qs().userId
+    const companyId = request.qs().companyId
     const redirect = request.qs().redirect
     session.put('userId', userId)
+    session.put('companyId', companyId)
     session.put('redirect', redirect)
     const passthroughVal = randomBytes(32).toString('hex')
 
@@ -49,19 +54,18 @@ export default class AuthCalendliesController {
     const authorizationUrl = `${env.get('CALENDLY_AUTH_BASE_URL')}/oauth/authorize`
     console.log(redirect, userId)
 
-    const url = `${authorizationUrl}?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&state=${passthroughVal}&user_id=${userId}`
+    const url = `${authorizationUrl}?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&state=${passthroughVal}`
     return response.redirect(url)
   }
 
   async handleCallback({ session, request, response }: HttpContext) {
     try {
-      const { code, state, user_id } = request.qs() // Recupera el parámetro `state`
+      const { code, state } = request.qs() // Recupera el parámetro `state`
 
-      console.log(user_id)
       // Verifica que el estado coincida con el almacenado en la sesión
       const storedState = session.get('state')
       console.log('state stored')
-      console.log(storedState)
+      console.log(session.get('companyId'))
 
       if (!storedState || storedState !== state) {
         return response.status(400).send('Estado no válido o sesión expirada.')
@@ -100,6 +104,7 @@ export default class AuthCalendliesController {
           access_token,
           refresh_token,
           user_id: session.get('userId'),
+          company_id: session.get('companyId'),
         })
       }
 
