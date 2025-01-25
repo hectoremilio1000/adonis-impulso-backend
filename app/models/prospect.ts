@@ -29,6 +29,9 @@ export default class Prospect extends BaseModel {
   @column()
   declare status: string
 
+  @column()
+  declare origin: string
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

@@ -8,6 +8,7 @@
 */
 
 import router from '@adonisjs/core/services/router'
+import '@adonisjs/view'
 
 const AuthController = () => import('#controllers/auth_controller')
 import { middleware } from './kernel.js'
@@ -23,16 +24,16 @@ const CompaniesController = () => import('#controllers/companies_controller')
 const SedesController = () => import('#controllers/sedes_controller')
 const SubscriptionsController = () => import('#controllers/subscriptions_controller')
 const SuccesscasesController = () => import('#controllers/successcases_controller')
-import TestMailsController from '#controllers/test_mails_controller'
-import PaymentsController from '#controllers/payments_controller'
-import OpeanaichatsController from '#controllers/opeanaichats_controller'
-import TestGoogleAdsController from '#controllers/test_google_ads_controller'
-import AuthCalendliesController from '#controllers/auth_calendlies_controller'
-import CalendlyEventsController from '#controllers/calendly_events_controller'
-import TestTiktokAdsController from '#controllers/test_tiktok_ads_controller'
-import QuestionsController from '#controllers/questions_controller'
-import ResponsesController from '#controllers/responses_controller'
-import RecommendationsController from '#controllers/recommendations_controller'
+const TestMailsController = () => import('#controllers/test_mails_controller')
+const PaymentsController = () => import('#controllers/payments_controller')
+const OpeanaichatsController = () => import('#controllers/opeanaichats_controller')
+const TestGoogleAdsController = () => import('#controllers/test_google_ads_controller')
+const AuthCalendliesController = () => import('#controllers/auth_calendlies_controller')
+const CalendlyEventsController = () => import('#controllers/calendly_events_controller')
+const TestTiktokAdsController = () => import('#controllers/test_tiktok_ads_controller')
+const QuestionsController = () => import('#controllers/questions_controller')
+const ResponsesController = () => import('#controllers/responses_controller')
+const RecommendationsController = () => import('#controllers/recommendations_controller')
 import CandidatesController from '#controllers/candidates_controller'
 import ExamsController from '#controllers/exams_controller'
 // import AuthController from '#controllers/auth_controller'
@@ -166,8 +167,17 @@ router.post('/api/sections', [SectionsController, 'store']).as('sections.store')
 router.get('/api/prospects', [ProspectsController, 'index']).as('prospect.index')
 router.get('/api/prospects/:id', [ProspectsController, 'show']).as('prospect.show')
 router.post('/api/prospects', [ProspectsController, 'store']).as('prospect.store')
+// Nueva ruta para la reunión presencial
 router
-  .get('/api/prospectswebsite', [ProspectsController, 'storeWebSite'])
+  .post('/api/prospectsmeeting', [ProspectsController, 'storeMeeting'])
+  .as('prospect.storeMeeting')
+router
+  .post('/api/prospectsWithRecommendations', [ProspectsController, 'storeWithRecommendations'])
+  .as('prospect.storeWithRecommendations')
+
+// RUTA PARA RECIBIR DATOS DESDE EL SITIO WEB
+router
+  .post('/api/prospectswebsite', [ProspectsController, 'storeWebSite'])
   .as('prospect.storeWebSite')
 
 //RUTA PARA RECIBIR LOS DATOS DE LAS QUESTIONS

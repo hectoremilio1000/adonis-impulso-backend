@@ -35,7 +35,7 @@ export default class QuestionsController {
       return {
         status: 'error',
         code: 500,
-        message: 'Error fetching prospects',
+        message: 'Error fetching Questions',
         error: error.message,
       }
     }
