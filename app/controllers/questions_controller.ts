@@ -28,14 +28,14 @@ export default class QuestionsController {
       return {
         status: 'success',
         code: 200,
-        message: 'Prospects fetched succesfully',
+        message: 'Questions fetched succesfully',
         data: questions,
       }
     } catch (error) {
       return {
         status: 'error',
         code: 500,
-        message: 'Error fetching prospects',
+        message: 'Error fetching Questions',
         error: error.message,
       }
     }

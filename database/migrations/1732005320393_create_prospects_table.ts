@@ -11,6 +11,7 @@ export default class extends BaseSchema {
       table.string('email').notNullable()
       table.string('whatsapp', 15).notNullable()
       table.string('status', 255).notNullable()
+      table.string('origin', 255).nullable()
       //agregar origen columna
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now()) // Created timestamp
       table.timestamp('updated_at', { useTz: true }).defaultTo(this.now()) // Updated timestamp
