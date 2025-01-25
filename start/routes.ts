@@ -33,6 +33,8 @@ import TestTiktokAdsController from '#controllers/test_tiktok_ads_controller'
 import QuestionsController from '#controllers/questions_controller'
 import ResponsesController from '#controllers/responses_controller'
 import RecommendationsController from '#controllers/recommendations_controller'
+import CandidatesController from '#controllers/candidates_controller'
+import ExamsController from '#controllers/exams_controller'
 // import AuthController from '#controllers/auth_controller'
 
 router.get('/api', async () => {
@@ -186,6 +188,17 @@ router
   .get('/api/recommendations/:id', [RecommendationsController, 'show'])
   .as('recommendation.show')
 router.post('/api/recommendations', [RecommendationsController, 'store']).as('recommendation.store')
+
+//RUTA PARA RECIBIR LOS DATOS DE LOS CANDIDATES
+router.get('/api/candidates', [CandidatesController, 'index']).as('candidate.index')
+router.get('/api/candidates/:id', [CandidatesController, 'show']).as('candidate.show')
+router.post('/api/candidates', [CandidatesController, 'store']).as('candidate.store')
+
+//RUTA PARA RECIBIR LOS DATOS DE LOS examenes
+router.get('/api/exams', [ExamsController, 'index']).as('exam.index')
+router.get('/api/examsQuery', [ExamsController, 'query']).as('exam.query')
+router.get('/api/exams/:id', [ExamsController, 'show']).as('exam.show')
+router.post('/api/exams', [ExamsController, 'store']).as('exam.store')
 
 // RUTA PARA OPENAI
 

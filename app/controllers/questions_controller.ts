@@ -28,7 +28,7 @@ export default class QuestionsController {
       return {
         status: 'success',
         code: 200,
-        message: 'Prospects fetched succesfully',
+        message: 'Questions fetched succesfully',
         data: questions,
       }
     } catch (error) {
