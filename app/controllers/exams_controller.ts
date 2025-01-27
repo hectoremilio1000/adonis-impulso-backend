@@ -31,12 +31,12 @@ export default class ExamsController {
       // Construir la consulta dinámica
       const examsQuery = Exam.query()
 
-      if (typeExamen !== 'null') {
+      if (typeExamen) {
         console.log('tipo de examen')
         examsQuery.where('type', typeExamen) // Filtrar por "type_examen"
       }
 
-      if (puesto !== 'null') {
+      if (puesto) {
         console.log('puesto')
         examsQuery.where('name', puesto) // Filtrar por "puesto"
       }
