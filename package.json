@@ -58,7 +58,6 @@
     "@adonisjs/mail": "^9.2.2",
     "@adonisjs/repl": "^4.0.1",
     "@adonisjs/session": "^7.5.0",
-    "@adonisjs/view": "^6.2.0",
     "@googleapis/docs": "^3.3.0",
     "@vinejs/vine": "^2.1.0",
     "axios": "^1.7.9",

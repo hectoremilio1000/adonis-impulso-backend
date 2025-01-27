@@ -24,18 +24,20 @@ export default class ExamsController {
   public async query({ request }: HttpContext) {
     // Obtener parámetros de consulta
     const data = request.qs() // "Psicosometricos"
-    const typeExamen = request.input('type_exam') // "Psicosometricos"
-    const puesto = request.input('puesto') // "mozo"
+    const typeExamen = data.type_exam // "Psicosometricos"
+    const puesto = data.puesto // "mozo"
     console.log(data)
     try {
       // Construir la consulta dinámica
       const examsQuery = Exam.query()
 
-      if (typeExamen) {
+      if (typeExamen !== 'null') {
+        console.log('tipo de examen')
         examsQuery.where('type', typeExamen) // Filtrar por "type_examen"
       }
 
-      if (puesto) {
+      if (puesto !== 'null') {
+        console.log('puesto')
         examsQuery.where('name', puesto) // Filtrar por "puesto"
       }
       // Ejecutar la consulta

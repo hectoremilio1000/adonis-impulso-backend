@@ -8,7 +8,6 @@
 */
 
 import router from '@adonisjs/core/services/router'
-import '@adonisjs/view'
 
 const AuthController = () => import('#controllers/auth_controller')
 import { middleware } from './kernel.js'

@@ -1,11 +1,11 @@
 import { DateTime } from 'luxon'
-import { BaseModel, belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
+import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
 import Answer from './answer.js'
-import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
-
-import Exam from './exam.js'
+import type { HasMany } from '@adonisjs/lucid/types/relations'
 
 export default class QuestionCandidate extends BaseModel {
+  public static table = 'questions_candidates'
+
   @column({ isPrimary: true })
   declare id: number
 
@@ -50,11 +50,6 @@ export default class QuestionCandidate extends BaseModel {
 
   @column()
   declare correct_answer: 'A' | 'B' | 'C' | 'D' | 'E'
-
-  @belongsTo(() => Exam, {
-    foreignKey: 'exam_id',
-  })
-  declare exam: BelongsTo<typeof Exam>
 
   @hasMany(() => Answer, {
     foreignKey: 'question_id',
