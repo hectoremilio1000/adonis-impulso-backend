@@ -11,6 +11,8 @@ import router from '@adonisjs/core/services/router'
 
 const AuthController = () => import('#controllers/auth_controller')
 import { middleware } from './kernel.js'
+const CandidatesController = () => import('#controllers/candidates_controller')
+const ExamsController = () => import('#controllers/exams_controller')
 
 // const TestMailController = () => import('#controllers/test_mails_controller')
 
@@ -33,8 +35,7 @@ const TestTiktokAdsController = () => import('#controllers/test_tiktok_ads_contr
 const QuestionsController = () => import('#controllers/questions_controller')
 const ResponsesController = () => import('#controllers/responses_controller')
 const RecommendationsController = () => import('#controllers/recommendations_controller')
-import CandidatesController from '#controllers/candidates_controller'
-import ExamsController from '#controllers/exams_controller'
+
 // import AuthController from '#controllers/auth_controller'
 
 router.get('/api', async () => {
