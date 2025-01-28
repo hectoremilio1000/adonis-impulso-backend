@@ -281,7 +281,7 @@ export default class ProspectsController {
 
       // Ruta del PDF que será enviado como adjunto
       const pdfPath = app.makePath(
-        'resources/Estudio_de_3_Restaurantes_que_Triunfan_a_lo_Grande.pdf'
+        'public/pdf/Estudio_de_3_Restaurantes_que_Triunfan_a_lo_Grande.pdf'
       )
 
       // Enviar el correo con el contenido directamente
