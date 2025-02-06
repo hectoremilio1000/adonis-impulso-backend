@@ -35,6 +35,8 @@ const ResponsesController = () => import('#controllers/responses_controller')
 const RecommendationsController = () => import('#controllers/recommendations_controller')
 import CandidatesController from '#controllers/candidates_controller'
 import ExamsController from '#controllers/exams_controller'
+import AnswerCandidatesController from '#controllers/answer_candidates_controller'
+import ResultsCandidatesController from '#controllers/results_candidates_controller'
 // import AuthController from '#controllers/auth_controller'
 
 router.get('/api', async () => {
@@ -208,6 +210,34 @@ router.get('/api/exams', [ExamsController, 'index']).as('exam.index')
 router.get('/api/examsQuery', [ExamsController, 'query']).as('exam.query')
 router.get('/api/exams/:id', [ExamsController, 'show']).as('exam.show')
 router.post('/api/exams', [ExamsController, 'store']).as('exam.store')
+
+//RUTA PARA RECIBIR LOS DATOS DE LOS preguntas
+router
+  .get('/api/answer_candidates', [AnswerCandidatesController, 'index'])
+  .as('answer_candidate.index')
+router
+  .get('/api/answer_candidates/:id', [AnswerCandidatesController, 'show'])
+  .as('answer_candidate.show')
+router
+  .get('/api/getAttempAnswer/:candidateId', [AnswerCandidatesController, 'getAttempAnswer'])
+  .as('answer_candidate.getAttempAnswer')
+router
+  .post('/api/answer_candidates', [AnswerCandidatesController, 'store'])
+  .as('answer_candidate.store')
+router
+  .post('/api/answerCandidatesByGroup', [AnswerCandidatesController, 'answerCandidatesByGroup'])
+  .as('answer_candidate.answerCandidatesByGroup')
+
+//RUTA PARA RECIBIR LOS DATOS DE LOS resultados
+router
+  .get('/api/results_candidates', [ResultsCandidatesController, 'index'])
+  .as('result_candidate.index')
+router
+  .get('/api/results_candidates/:id', [ResultsCandidatesController, 'show'])
+  .as('result_candidate.show')
+router
+  .post('/api/results_candidates', [ResultsCandidatesController, 'store'])
+  .as('result_candidate.store')
 
 // RUTA PARA OPENAI
 
