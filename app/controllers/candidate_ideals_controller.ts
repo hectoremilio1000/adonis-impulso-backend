@@ -1,16 +1,16 @@
-import Candidate from '#models/candidate'
+import CandidateIdeal from '#models/candidate_ideal'
 import type { HttpContext } from '@adonisjs/core/http'
 
-export default class CandidatesController {
+export default class CandidateIdealsController {
   // Listar todos los modules (GET /modules)
   public async index({}: HttpContext) {
     try {
-      const candidates = await Candidate.all()
+      const cnadidate_ideals = await CandidateIdeal.all()
       return {
         status: 'success',
         code: 200,
-        message: 'Candidates fetched successfully',
-        data: candidates,
+        message: 'cnadidate_ideals fetched successfully',
+        data: cnadidate_ideals,
       }
     } catch (error) {
       return {
@@ -25,12 +25,12 @@ export default class CandidatesController {
   // Mostrar un module individual por ID (GET /modules/:id)
   public async show({ params }: HttpContext) {
     try {
-      const candidate = await Candidate.findOrFail(params.id)
+      const candidate_ideal = await CandidateIdeal.findOrFail(params.id)
       return {
         status: 'success',
         code: 200,
         message: 'Module fetched successfully',
-        data: candidate,
+        data: candidate_ideal,
       }
     } catch (error) {
       return {
@@ -45,17 +45,17 @@ export default class CandidatesController {
   // Crear un nuevo module (POST /modules)
   public async store({ request }: HttpContext) {
     try {
-      const data = request.only(['candidate']) // Asume que estos campos existen
+      const data = request.only(['candidate_ideal']) // Asume que estos campos existen
 
       if (data) {
-        const candidate = await Candidate.create(data.candidate)
+        const candidate_ideal = await CandidateIdeal.create(data.candidate_ideal)
         // Crear el nuevo module con el `created_by` del usuario autenticado
 
         return {
           status: 'success',
           code: 201,
-          message: 'Candidate created successfully',
-          data: candidate,
+          message: 'candidate_ideal created successfully',
+          data: candidate_ideal,
         }
       }
     } catch (error) {
@@ -68,27 +68,22 @@ export default class CandidatesController {
     }
   }
   // Crear un nuevo module (POST /modules)
-  public async updateStatusCandidate({ request }: HttpContext) {
+  public async getCandidateIdealByPuesto({ params }: HttpContext) {
     try {
-      const data = request.only(['candidateId', 'status']) // Asume que estos campos existen
-      const candidate = await Candidate.findOrFail(data.candidateId)
-      const datanew = { status: data.status }
-      if (data) {
-        candidate.merge(datanew)
-        await candidate.save()
+      const puesto = params.puesto // Asume que estos campos existen
+      const candidate_ideal = await CandidateIdeal.query().where('puesto', puesto)
 
-        return {
-          status: 'success',
-          code: 201,
-          message: 'Candidate updated successfully',
-          data: candidate,
-        }
+      return {
+        status: 'success',
+        code: 201,
+        message: 'candidate_ideal updated successfully',
+        data: candidate_ideal,
       }
     } catch (error) {
       return {
         status: 'error',
         code: 500,
-        message: 'Error update ',
+        message: 'Error get candidate ideal for puesto ',
         error: error.message,
       }
     }

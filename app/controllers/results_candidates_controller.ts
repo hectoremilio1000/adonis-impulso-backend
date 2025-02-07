@@ -43,6 +43,27 @@ export default class ResultsCandidatesController {
     }
   }
 
+  // Mostrar un answer individual por ID (GET /modules/:id)
+  public async getResultsCandidate({ params }: HttpContext) {
+    try {
+      const candidateId = params.candidateId
+      const result = await ResultCandidate.query().where('candidateId', candidateId)
+      return {
+        status: 'success',
+        code: 200,
+        message: 'Module fetched successfully',
+        data: result,
+      }
+    } catch (error) {
+      return {
+        status: 'error',
+        code: 404,
+        message: 'Module not found',
+        error: error.message,
+      }
+    }
+  }
+
   // Función genérica para calcular puntajes
 
   public calcularPuntajePorExamen(

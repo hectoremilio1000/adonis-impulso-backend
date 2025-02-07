@@ -37,6 +37,7 @@ import CandidatesController from '#controllers/candidates_controller'
 import ExamsController from '#controllers/exams_controller'
 import AnswerCandidatesController from '#controllers/answer_candidates_controller'
 import ResultsCandidatesController from '#controllers/results_candidates_controller'
+import CandidateIdealsController from '#controllers/candidate_ideals_controller'
 // import AuthController from '#controllers/auth_controller'
 
 router.get('/api', async () => {
@@ -204,6 +205,26 @@ router.post('/api/recommendations', [RecommendationsController, 'store']).as('re
 router.get('/api/candidates', [CandidatesController, 'index']).as('candidate.index')
 router.get('/api/candidates/:id', [CandidatesController, 'show']).as('candidate.show')
 router.post('/api/candidates', [CandidatesController, 'store']).as('candidate.store')
+router
+  .put('/api/updateStatusCandidate', [CandidatesController, 'updateStatusCandidate'])
+  .as('candidate.updateStatusCandidate')
+
+//RUTA PARA RECIBIR LOS DATOS DE LOS CANDIDATE IDEAL
+router
+  .get('/api/candidate_ideals', [CandidateIdealsController, 'index'])
+  .as('candidate_ideal.index')
+router
+  .get('/api/candidate_ideals/:id', [CandidateIdealsController, 'show'])
+  .as('candidate_ideal.show')
+router
+  .post('/api/candidate_ideals', [CandidateIdealsController, 'store'])
+  .as('candidate_ideal.store')
+router
+  .get('/api/getCandidateIdealByPuesto/:puesto', [
+    CandidateIdealsController,
+    'getCandidateIdealByPuesto',
+  ])
+  .as('candidate_ideal.getCandidateIdealByPuesto')
 
 //RUTA PARA RECIBIR LOS DATOS DE LOS examenes
 router.get('/api/exams', [ExamsController, 'index']).as('exam.index')
@@ -238,6 +259,12 @@ router
 router
   .post('/api/results_candidates', [ResultsCandidatesController, 'store'])
   .as('result_candidate.store')
+router
+  .get('/api/getResultsCandidate/:candidateId', [
+    ResultsCandidatesController,
+    'getResultsCandidate',
+  ])
+  .as('getResultsCandidate.store')
 
 // RUTA PARA OPENAI
 
