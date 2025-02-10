@@ -1,6 +1,7 @@
 import ResultCandidate from '#models/result_candidate'
 import type { HttpContext } from '@adonisjs/core/http'
 import AnswerCandidate from '#models/answer_candidate'
+import Candidate from '#models/candidate'
 
 export default class ResultsCandidatesController {
   // Listar todos los answer candidates (GET /modules)
@@ -145,11 +146,16 @@ export default class ResultsCandidatesController {
           resultados[`${nombreExamen.toLowerCase()}Version`] = null
         }
       })
+      const puntajeResultados = this.calcularPuntajePorExamen(respuestasFormateadas, data.puesto)
+      resultados[`puntajeConocimientos`] = puntajeResultados
 
       console.log('Puntajes psicométricos calculados:', resultados)
 
       if (data) {
         const result = await ResultCandidate.create(resultados)
+
+        const candidate = await Candidate.findOrFail(data.candidateId)
+        candidate.merge({ status: 'Exam Completed' })
         return {
           status: 'success',
           code: 201,
