@@ -5,12 +5,14 @@ import OpenAI from 'openai'
 export default class RecommendationsController {
   public async index({}: HttpContext) {
     try {
-      const recommendations = await Recommendation.query().preload('prospect')
+      const recommendations = await Recommendation.query()
+        .preload('prospect') // <-- Prospecto (si la recomendación es de un prospect_id)
+        .preload('user') // <-- Usuario (si la recomendación es de un user_id)
 
       return {
         status: 'success',
         code: 200,
-        message: 'Prospects fetched succesfully',
+        message: 'Prospects fetched successfully',
         data: recommendations,
       }
     } catch (error) {
@@ -22,21 +24,24 @@ export default class RecommendationsController {
       }
     }
   }
+
   public async show({ params }: HttpContext) {
     try {
-      const recommendations = await Recommendation.query()
+      const recommendation = await Recommendation.query()
         .preload('prospect', (prospectQuery) => {
           prospectQuery.preload('options', (optionQuery) => {
             optionQuery.preload('question')
           })
         })
+        .preload('user') // <-- Carga el user si existe user_id
         .where('id', params.id)
         .first()
+
       return {
         status: 'success',
         code: 200,
-        message: 'Prospects fetched succesfully',
-        data: recommendations,
+        message: 'Prospects fetched successfully',
+        data: recommendation,
       }
     } catch (error) {
       return {
@@ -51,8 +56,7 @@ export default class RecommendationsController {
   public async store({ request }: HttpContext) {
     try {
       const openai = new OpenAI()
-      const data = request.only(['respuestas', 'nombreUsuario', 'prospect_id'])
-      // const response = await Recommendation.create(data)
+      const data = request.only(['respuestas', 'nombreUsuario', 'prospect_id', 'user_id'])
       console.log(data)
 
       if (data.respuestas && Array.isArray(data.respuestas)) {
@@ -114,7 +118,7 @@ export default class RecommendationsController {
             `
 
         const completion = await openai.chat.completions.create({
-          model: 'gpt-3.5-turbo',
+          model: 'gpt-4o',
           messages: [
             {
               role: 'system',
@@ -130,7 +134,8 @@ export default class RecommendationsController {
           newRecommendation += completion.choices[0].message?.content?.trim()
         }
         let newRecomendation = {
-          prospect_id: data.prospect_id, //ID del prospecto registrado
+          prospect_id: data.prospect_id || null,
+          user_id: data.user_id || null, // <-- el cambio clave
           text: newRecommendation,
         }
         const recommendation = await Recommendation.create(newRecomendation)

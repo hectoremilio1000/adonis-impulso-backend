@@ -1,7 +1,9 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, manyToMany } from '@adonisjs/lucid/orm'
-import type { ManyToMany } from '@adonisjs/lucid/types/relations'
+import { BaseModel, column, hasMany, manyToMany } from '@adonisjs/lucid/orm'
+import type { ManyToMany, HasMany } from '@adonisjs/lucid/types/relations'
 import Option from './option.js'
+import Recommendation from './recommendation.js'
+import { default as ResponseModel } from './response.js'
 
 export default class Prospect extends BaseModel {
   @column({ isPrimary: true })
@@ -25,6 +27,20 @@ export default class Prospect extends BaseModel {
     pivotRelatedForeignKey: 'option_id', // Columna en la tabla pivote que hace referencia a `Module`
   })
   declare options: ManyToMany<typeof Option>
+
+  @hasMany(() => ResponseModel, {
+    foreignKey: 'prospect_id',
+  })
+  declare responses: HasMany<typeof ResponseModel>
+
+  /**
+   * Relación hasMany con "Recommendation" (tabla con prospect_id).
+   * Esto te permite usar .preload('recommendations') o .whereHas('recommendations').
+   */
+  @hasMany(() => Recommendation, {
+    foreignKey: 'prospect_id',
+  })
+  declare recommendations: HasMany<typeof Recommendation>
 
   @column()
   declare status: string

@@ -7,8 +7,8 @@ const authConfig = defineConfig({
   guards: {
     api: tokensGuard({
       provider: tokensUserProvider({
-        tokens: 'accessTokens',
-        model: () => import('#models/user')
+        tokens: 'accessTokens', // Nombre estático en el Modelo
+        model: () => import('#models/user'),
       }),
     }),
   },
@@ -16,10 +16,6 @@ const authConfig = defineConfig({
 
 export default authConfig
 
-/**
- * Inferring types from the configured auth
- * guards.
- */
 declare module '@adonisjs/auth/types' {
   export interface Authenticators extends InferAuthenticators<typeof authConfig> {}
 }

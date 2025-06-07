@@ -16,6 +16,7 @@ export const registerValidator = vine.compile(
     name: vine.string().minLength(3),
     // created_by: vine.number(), // Asume que es una ID de usuario
     rol_id: vine.number(), // Asume que es una ID de rol
+    whatsapp: vine.string().optional(),
   })
 )
 

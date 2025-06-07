@@ -34,6 +34,12 @@ new Ignitor(APP_ROOT, { importer: IMPORTER })
     app.booting(async () => {
       await import('#start/env')
     })
+
+    // Execute the code inside the "scheduler.ts" file
+    app.ready(async () => {
+      await import('#start/scheduler')
+    })
+
     app.listen('SIGTERM', () => app.terminate())
     app.listenIf(app.managedByPm2, 'SIGINT', () => app.terminate())
   })

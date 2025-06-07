@@ -1,164 +1,273 @@
-import type { HttpContext } from '@adonisjs/core/http'
+// app/Controllers/Http/PaymentsController.ts
 
 import env from '#start/env'
-import { MercadoPagoConfig, PreApproval, Preference } from 'mercadopago'
+import type { HttpContext } from '@adonisjs/core/http'
+import { MercadoPagoConfig, Payment, PreApproval, Preference } from 'mercadopago'
+import { DateTime } from 'luxon'
+import Transaction from '#models/transaction'
+import Subscription from '#models/subscription'
+
+// (Opcional) Si usas DB para suscripciones y transacciones
+// import Subscription from 'App/Models/Subscription'
+// import Transaction from 'App/Models/Transaction'
+// import { DateTime } from 'luxon'
 
 export default class PaymentsController {
-  public async store({ request }: HttpContext) {
+  /**
+   * POST /payments
+   * Crea un link de pago (checkout) según `type`.
+   * - "preference" => pago puntual
+   * - "preapproval" => suscripción recurrente
+   */
+  public async store({ request, response }: HttpContext) {
     try {
-      const data = request.only(['name', 'price', 'description', 'email', 'type']) // Asume que estos campos existen
-      console.log(data)
+      const data = request.only([
+        'type',
+        'name',
+        'price',
+        'description',
+        'email',
+        'plan_id',
+        'subscription_id',
+      ])
+      console.log('Request Payment =>', data)
+      console.log('MP Token =>', env.get('MP_ACCESS_TOKEN'))
 
-      const mercadopago = new MercadoPagoConfig({
-        accessToken: process.env.MP_ACCESS_TOKEN!,
+      // 1. Inicializamos con Access Token
+      const mpConfig = new MercadoPagoConfig({
+        accessToken: env.get('MP_ACCESS_TOKEN')!,
       })
-      if (data.type === 'preaproval') {
-        const info = await new PreApproval(mercadopago).create({
+
+      // 2. Lógica según type
+      if (data.type === 'preapproval') {
+        // === Suscripciones recurrentes ===
+        const info = await new PreApproval(mpConfig).create({
           body: {
             back_url: env.get('APP_URL'),
             reason: `${data.name} - ${data.description}`,
             auto_recurring: {
               frequency: 1,
               frequency_type: 'months',
-              transaction_amount: data.price,
+              transaction_amount: Number(data.price),
               currency_id: 'MXN',
             },
             payer_email: data.email,
             status: 'pending',
           },
         })
-        return {
-          status: 'success',
-          code: 200,
-          message: 'Modules fetched successfully',
-          data: { url: info.init_point },
-        }
-      }
-      if (data.type === 'preference') {
-        const preference = new Preference(mercadopago)
 
+        return response.ok({
+          status: 'success',
+          message: 'Suscripción preaprobada',
+          data: { url: info.init_point },
+        })
+      } else if (data.type === 'preference') {
+        // === Pagos puntuales ===
+        const preference = new Preference(mpConfig)
         const body = {
           items: [
             {
-              // id: 'item-123',
-              id: '',
+              id: `plan-${data.plan_id}`,
               title: data.name,
               description: data.description,
-              picture_url:
-                'https://multipreventiva.com/wp-content/uploads/2023/09/multipreventiva-plan-red-cucuta-3.png', // Cambia por una URL válida
-              category_id: 'electronics', // Puedes cambiar la categoría
               quantity: 1,
               currency_id: 'MXN',
-              unit_price: data.price, // Precio del producto
+              unit_price: Number(data.price),
             },
           ],
           payer: {
             email: data.email,
           },
-          back_urls: {
-            success: 'http://localhost:3000/success', // Cambia por tu URL
-            failure: 'http://localhost:3000/failure', // Cambia por tu URL
-            pending: 'http://localhost:3000/pending', // Cambia por tu URL
+          // IMPORTANT: Guardamos subscription_id (si existe) en metadata
+          metadata: {
+            subscription_id: data.subscription_id,
+            plan_id: data.plan_id,
           },
-          auto_return: 'approved', // Redirección automática para pagos aprobados
+          back_urls: {
+            success: env.get('FRONT_URL') + '/success',
+            failure: env.get('FRONT_URL') + '/failure',
+            pending: env.get('FRONT_URL') + '/pending',
+          },
+          auto_return: 'approved',
+          // notification_url: env.get('APP_URL') + '/payments/notification'
         }
-        const response = await preference.create({ body })
-        console.log(response)
-        return {
+        const result = await preference.create({ body })
+
+        return response.ok({
           status: 'success',
-          code: 200,
-          message: 'Modules fetched successfully',
-          data: { url: response.init_point },
-        }
-      }
-    } catch (error) {
-      console.log(error)
-      return {
-        status: 'error',
-        code: 500,
-        message: 'Error fetching Transactions',
-        error: error.message,
-      }
-    }
-  }
-  public async notification({ request }: HttpContext) {
-    try {
-      const data = request.only(['id', 'type']) // Asume que estos campos existen
-
-      // Solo nos interesan las notificaciones de suscripciones
-      if (data.type === 'subscription_preapproval') {
-        const mercadopago = new MercadoPagoConfig({
-          accessToken: process.env.MP_ACCESS_TOKEN!,
+          message: 'Preferencia creada (pago puntual)',
+          data: { url: result.init_point },
         })
-        // Obtenemos la suscripción
-        const preapproval = await new PreApproval(mercadopago).get({ id: data.id })
-        console.log(preapproval)
+      } else {
+        // type inválido
+        return response.badRequest({
+          status: 'error',
+          message: 'Tipo de pago inválido. Usa "preapproval" o "preference".',
+        })
+      }
+    } catch (error) {
+      console.error(error)
+      return response.internalServerError({
+        status: 'error',
+        message: 'Error creando pago en Mercado Pago',
+        error: error.message,
+      })
+    }
+  }
 
-        // Si se aprueba, actualizamos el usuario con el id de la suscripción
-        if (preapproval.status === 'authorized') {
-          // Actualizamos el usuario con el id de la suscripción
-          console.log('subscription creada successfily')
+  /**
+   * POST /payments/notification
+   * Webhook de Mercado Pago: notifica eventos ("subscription_preapproval", "payment", etc.)
+   */
+  public async notification({ request, response }: HttpContext) {
+    try {
+      const { id, type, topic } = request.qs()
+      console.log('Webhook MP =>', { id, type, topic })
+
+      const body = request.body()
+      console.log('Webhook MP =>', body)
+
+      const paymentId = body.data?.id
+      console.log('paymentId =>', paymentId)
+
+      // 1. Configurar MP
+      const mpConfig = new MercadoPagoConfig({
+        accessToken: env.get('MP_ACCESS_TOKEN')!,
+      })
+
+      // 2. Obtener info del pago
+      const paymentObject = new Payment(mpConfig)
+      const paymentResult = await paymentObject.get({ id: paymentId })
+      console.log('resultado', paymentResult)
+
+      // Sacar metadata => subscriptionId
+      const metadata = paymentResult.metadata
+      const subscriptionId = metadata?.subscription_id
+      console.log('subscriptionId =>', subscriptionId)
+
+      const paymentStatus = paymentResult.status // "approved", etc.
+      const amount = paymentResult.transaction_amount
+      const dateApproved = paymentResult.date_approved // string
+      const paymentNumber = paymentId
+
+      // -------------------
+      // CREAR/ACTUALIZAR Transaction
+      // -------------------
+      let transaction = await Transaction.findBy('transaction_number', paymentNumber)
+      if (!transaction) {
+        transaction = new Transaction()
+        transaction.transaction_number = Number(paymentNumber)
+        transaction.subscription_id = Number(subscriptionId) // si lo necesitas
+        transaction.method_payment = 'mercado_pago'
+        transaction.amount = amount ?? 0
+        transaction.payment_date = dateApproved || DateTime.now().toISO()
+      }
+      transaction.status = paymentStatus as string
+      await transaction.save()
+
+      // -------------------
+      // ACTUALIZAR Suscripción
+      // -------------------
+      // Si es un "payment" => si status === 'approved', pasamos a 'active'
+      if ((type === 'payment' || topic === 'payment') && paymentStatus === 'approved') {
+        console.log('Pago normal => status=approved => actualizar suscripción en DB')
+
+        if (subscriptionId) {
+          const subscription = await Subscription.find(subscriptionId)
+          if (subscription) {
+            subscription.status = 'active'
+
+            // Convertir end_date a DateTime de Luxon
+            // 1) Si ya tiene end_date en la DB, lo parseamos con fromSQL
+            //    (porque "YYYY-MM-DD HH:mm:ss" es formato SQL)
+            let endDate: DateTime
+            if (subscription.end_date) {
+              // fromSQL maneja "2025-03-02 00:00:00"
+              endDate = DateTime.fromSQL(subscription.end_date)
+
+              // fallback si parse falla
+              if (!endDate.isValid) {
+                endDate = DateTime.now()
+              }
+            } else {
+              // si no había end_date => partimos de hoy
+              endDate = DateTime.now()
+            }
+
+            // sumamos 30 días
+            endDate = endDate.plus({ days: 30 })
+
+            // guardamos en formato SQL => "YYYY-MM-DD HH:mm:ss"
+            // (sin offset)
+            subscription.end_date = endDate.toSQL({ includeOffset: false })
+
+            await subscription.save()
+          }
         }
       }
 
-      // Respondemos con un estado 200 para indicarle que la notificación fue recibida
-      //   return new Response(null, { status: 200 })
+      // Suscripciones recurrentes
+      if (type === 'subscription_preapproval' || topic === 'subscription_preapproval') {
+        const preapproval = await new PreApproval(mpConfig).get({ id })
+        console.log('PreApproval =>', preapproval)
 
-      return {
+        if (preapproval.status === 'authorized') {
+          // e.g. subscription.status='active'
+          console.log('Suscripción recurrente autorizada')
+        }
+      }
+
+      // 3. Responder OK
+      return response.ok({
         status: 'success',
-        code: 200,
-        message: 'subscription creada successfily',
-      }
+        message: 'Notificación recibida y procesada',
+      })
     } catch (error) {
-      console.log(error)
-      return {
+      console.error('Error en webhook MP =>', error)
+      return response.internalServerError({
         status: 'error',
-        code: 500,
-        message: 'Error fetching Transactions',
+        message: 'Error procesando la notificación de MP',
         error: error.message,
-      }
+      })
     }
   }
-  public async showSubscription({ params }: HttpContext) {
+  /**
+   * GET /payments/show-subscription/:id?type=...
+   * (Opcional) Consultar details de la preferencia/suscripción en MP
+   */
+  public async showSubscription({ params, request, response }: HttpContext) {
     try {
-      const data = { id: params.id, type: params.type } // Asume que estos campos existen
-      var info
-      // Solo nos interesan las notificaciones de suscripciones
-      const mercadopago = new MercadoPagoConfig({
-        accessToken: process.env.MP_ACCESS_TOKEN!,
+      const { type } = request.qs() // "subscription_preapproval" o "preference"
+      const id = params.id
+      console.log({ id, type })
+
+      const mpConfig = new MercadoPagoConfig({
+        accessToken: env.get('MP_ACCESS_TOKEN')!,
       })
-      console.log(data)
-      if (data.type === 'subscription_preapproval') {
-        // Obtenemos la suscripción
-        const preapproval = await new PreApproval(mercadopago).get({ id: data.id })
-        console.log(preapproval)
+
+      let info: any = null
+
+      if (type === 'subscription_preapproval') {
+        const preapproval = await new PreApproval(mpConfig).get({ id })
         info = preapproval
-      }
-      if (data.type === 'preference') {
-        // Obtenemos la preferenceia
-        const preference = new Preference(mercadopago)
-        const response = await preference.get({ preferenceId: 'id' })
-
-        info = response
+      } else if (type === 'preference') {
+        const preference = new Preference(mpConfig)
+        const resp = await preference.get({ preferenceId: id })
+        info = resp
       }
 
-      // Respondemos con un estado 200 para indicarle que la notificación fue recibida
-      //   return new Response(null, { status: 200 })
-
-      return {
+      return response.ok({
         status: 'success',
-        code: 200,
-        message: 'subscription get success',
+        message: 'Detalle obtenido',
         data: info,
-      }
+      })
     } catch (error) {
-      console.log(error)
-      return {
+      console.error(error)
+      return response.internalServerError({
         status: 'error',
-        code: 500,
-        message: 'Error fetching Transactions',
+        message: 'Error consultando details',
         error: error.message,
-      }
+      })
     }
   }
 }

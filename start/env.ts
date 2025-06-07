@@ -39,6 +39,7 @@ export default await Env.create(new URL('../', import.meta.url), {
   SMTP_USERNAME: Env.schema.string(),
   SMTP_PASSWORD: Env.schema.string(),
   MP_ACCESS_TOKEN: Env.schema.string(),
+  MP_PUBLIC_KEY: Env.schema.string.optional(),
   APP_URL: Env.schema.string(),
   // CREDENTIALS GOOGLE ADS API
   CLIENT_ID: Env.schema.string(),
@@ -62,4 +63,11 @@ export default await Env.create(new URL('../', import.meta.url), {
   |----------------------------------------------------------
   */
   SESSION_DRIVER: Env.schema.enum(['cookie', 'memory'] as const),
+
+  /*
+  |----------------------------------------------------------
+  | Variables for configuring the lock package
+  |----------------------------------------------------------
+  */
+  LOCK_STORE: Env.schema.enum(['database', 'memory'] as const),
 })

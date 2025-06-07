@@ -1,85 +1,143 @@
 import type { HttpContext } from '@adonisjs/core/http'
-
-import Sede from '#models/sede'
+import Sede from '#models/sede' // Ajusta la ruta real de tu modelo
 
 export default class SedesController {
-  // Listar todos los sedes (GET /sedes)
-  public async index({}: HttpContext) {
+  /**
+   * GET /api/sedes
+   * Lista todas las sedes
+   */
+  public async index({ response }: HttpContext) {
     try {
-      const sedes = await Sede.query()
+      // Consulta todas las sedes (o usa .query().preload(...) si tienes relaciones)
+      const sedes = await Sede.all()
 
-      return {
+      return response.status(200).json({
         status: 'success',
         code: 200,
-        message: 'Modules fetched successfully',
+        message: 'Sedes fetched successfully',
         data: sedes,
-      }
+      })
     } catch (error) {
-      console.log(error)
-      return {
+      console.error(error)
+      return response.status(500).json({
         status: 'error',
         code: 500,
-        message: 'Error fetching sedes',
+        message: 'Error al obtener sedes',
         error: error.message,
-      }
+      })
     }
   }
 
-  // Mostrar un sede individual por ID (GET /sedes/:id)
-  public async show({ params }: HttpContext) {
-    console.log(params)
-    const sede = await Sede.query().where('id', params.id).firstOrFail() // Cargar módulos relacionados
-    return sede
+  /**
+   * GET /api/sedes/:id
+   * Muestra los detalles de una sede
+   */
+  public async show({ params, response }: HttpContext) {
+    try {
+      const { id } = params
+      const sede = await Sede.findOrFail(id) // Lanza excepción si no existe
+
+      return response.status(200).json({
+        status: 'success',
+        code: 200,
+        message: 'Sede fetched successfully',
+        data: sede,
+      })
+    } catch (error) {
+      console.error(error)
+      return response.status(500).json({
+        status: 'error',
+        code: 500,
+        message: 'Error al obtener la sede',
+        error: error.message,
+      })
+    }
   }
 
-  // Crear un nuevo sede (POST /sedes)
-  public async store({ request, auth }: HttpContext) {
+  /**
+   * POST /api/sedes
+   * Crea una nueva sede
+   */
+  public async store({ request, response }: HttpContext) {
     try {
-      await auth.check()
+      // Ajusta los campos según tu modelo 'sede'
+      const data = request.only(['company_id', 'name', 'location', 'map_url', 'created_by'])
 
-      const data = request.only(['name', 'location', 'map_url', 'company_id']) // Asume que estos campos existen
-      const userId = auth.user?.id
+      const sede = await Sede.create(data)
 
-      // Crear el sede
-      const sede = await Sede.create({
-        name: data.name,
-        location: data.location,
-        map_url: data.map_url,
-        company_id: data.company_id,
-        created_by: userId,
-      })
-
-      return {
+      return response.status(201).json({
         status: 'success',
         code: 201,
-        message: 'sede creado correctamente con módulos asociados',
+        message: 'Sede created successfully',
         data: sede,
-      }
+      })
     } catch (error) {
-      console.log(error)
-      return {
+      console.error(error)
+      return response.status(500).json({
         status: 'error',
         code: 500,
-        message: 'Error creating sede',
+        message: 'Error al crear la sede',
         error: error.message,
-      }
+      })
     }
   }
 
-  // Actualizar un sede existente (PUT /sedes/:id)
-  public async update({ params, request }: HttpContext) {
-    console.log(params)
-    const sede = await Sede.findOrFail(params.id)
-    const data = request.only(['name', 'location', 'map_url', 'company_id'])
-    sede.merge(data)
-    await sede.save()
-    return sede
+  /**
+   * PUT /api/sedes/:id
+   * Actualiza una sede existente
+   */
+  public async update({ params, request, response }: HttpContext) {
+    try {
+      const { id } = params
+      const sede = await Sede.findOrFail(id)
+
+      // Campos a actualizar
+      const data = request.only(['company_id', 'name', 'location', 'map_url', 'updated_at'])
+
+      sede.merge(data)
+      await sede.save()
+
+      return response.status(200).json({
+        status: 'success',
+        code: 200,
+        message: 'Sede updated successfully',
+        data: sede,
+      })
+    } catch (error) {
+      console.error(error)
+      return response.status(500).json({
+        status: 'error',
+        code: 500,
+        message: 'Error al actualizar la sede',
+        error: error.message,
+      })
+    }
   }
 
-  // Eliminar un sede (DELETE /sedes/:id)
-  public async destroy({ params }: HttpContext) {
-    const sede = await Sede.findOrFail(params.id)
-    await sede.delete()
-    return { message: 'sede deleted successfully' }
+  /**
+   * DELETE /api/sedes/:id
+   * Elimina una sede
+   */
+  public async destroy({ params, response }: HttpContext) {
+    try {
+      const { id } = params
+      const sede = await Sede.findOrFail(id)
+      await sede.delete()
+
+      return response.status(200).json({
+        status: 'success',
+        code: 200,
+        message: 'Sede deleted successfully',
+        data: null, // o { id } si quieres retornar el id eliminado
+      })
+    } catch (error) {
+      console.error(error)
+      return response.status(500).json({
+        status: 'error',
+        code: 500,
+        message: 'Error al eliminar la sede',
+        error: error.message,
+      })
+    }
   }
 }

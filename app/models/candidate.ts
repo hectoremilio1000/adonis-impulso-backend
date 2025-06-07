@@ -1,7 +1,8 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
+import { BaseModel, belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
 import Answer from './answer.js'
-import type { HasMany } from '@adonisjs/lucid/types/relations'
+import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
+import Company from './company.js'
 
 export default class Candidate extends BaseModel {
   @column({ isPrimary: true })
@@ -16,11 +17,18 @@ export default class Candidate extends BaseModel {
   @column()
   declare email: string
 
-  @column()
+  @column({ columnName: 'cv_path' })
   declare cv_path: string | null
 
   @column()
+  declare comments: string | null
+
+  @column()
   declare position: string
+
+  // 1) Tu nueva columna
+  @column()
+  declare company_id: number | null
 
   @column({ columnName: 'reference1_company' })
   declare reference1Company: string
@@ -65,4 +73,9 @@ export default class Candidate extends BaseModel {
     foreignKey: 'candidate_id',
   })
   declare answers: HasMany<typeof Answer>
+
+  @belongsTo(() => Company, {
+    foreignKey: 'companyId', // La FK que definimos
+  })
+  declare company: BelongsTo<typeof Company>
 }

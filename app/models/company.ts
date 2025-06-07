@@ -3,6 +3,8 @@ import { BaseModel, belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import User from './user.js'
 import Sede from './sede.js'
+import Employee from './employee.js'
+import Candidate from './candidate.js'
 
 export default class Company extends BaseModel {
   @column({ isPrimary: true })
@@ -23,7 +25,7 @@ export default class Company extends BaseModel {
   @column()
   declare phone_contact: string
 
-  @column()
+  @column({ columnName: 'user_id' })
   declare user_id: number
 
   @column()
@@ -45,4 +47,14 @@ export default class Company extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
+
+  @hasMany(() => Employee, {
+    foreignKey: 'company_id',
+  })
+  declare employees: HasMany<typeof Employee>
+
+  @hasMany(() => Candidate, {
+    foreignKey: 'companyId', // la fk en el modelo Candidate
+  })
+  declare candidates: HasMany<typeof Candidate>
 }

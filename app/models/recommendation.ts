@@ -9,11 +9,12 @@ export default class Recommendation extends BaseModel {
   declare id: number
 
   @column()
-  declare prospect_id: number
+  declare prospect_id: number | null
 
   @column()
-  declare user_id: number
+  declare user_id: number | null
 
+  // Texto generado por la IA
   @column()
   declare text: string
 
